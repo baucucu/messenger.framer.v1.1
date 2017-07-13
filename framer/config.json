@@ -1,0 +1,29 @@
+{
+  "orientation" : 0,
+  "updateDelay" : 0.3,
+  "designModeSelected" : 0,
+  "cachedDeviceHeight" : 667,
+  "contentScale" : 1,
+  "fullScreen" : false,
+  "cachedDeviceWidth" : 375,
+  "deviceType" : "apple-iphone-7-black",
+  "sharedPrototype" : true,
+  "propertyPanelToggleStates" : {
+    "Filters" : false
+  },
+  "projectId" : "0BAC41E9-F4E8-4176-9DC2-BB7884EC826B",
+  "deviceOrientation" : 0,
+  "selectedHand" : "",
+  "showBezel" : true,
+  "foldedCodeRanges" : [
+    "{1, 378}",
+    "{380, 680}",
+    "{1061, 87}",
+    "{1149, 1936}",
+    "{3086, 891}",
+    "{3978, 2565}",
+    "{6544, 2747}",
+    "{9292, 3742}"
+  ],
+  "deviceScale" : "fit"
+}
