@@ -12,7 +12,7 @@ systemBackgroundColorInactive = "#DEDEDE";
 
 systemFontFamily = "-apple-system";
 
-battery = "100%";
+battery = "90%";
 
 systemTime = "9:41 PM";
 

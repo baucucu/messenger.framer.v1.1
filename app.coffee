@@ -11,7 +11,7 @@ systemBackgroundColorInactive = "#DEDEDE"
 systemFontFamily = "-apple-system"
 
 # statusBar settings
-battery = "100%"
+battery = "85%"
 systemTime = "9:41 PM"
 signal = 5
 systemFontColor = "rgba(3,3,3,1)"
