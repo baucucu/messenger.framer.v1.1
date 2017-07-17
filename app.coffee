@@ -11,7 +11,7 @@ systemBackgroundColorInactive = "#DEDEDE"
 systemFontFamily = "-apple-system"
 
 # statusBar settings
-battery = "85%"
+battery = "100%"
 systemTime = "9:41 PM"
 signal = 5
 systemFontColor = "rgba(3,3,3,1)"
@@ -62,7 +62,7 @@ statusBar = new StatusBarLayer
 	# Text
 	carrier: "VodafoneRO" #<string>
 	time: "9:41 PM" #<string> # if not set, will use local time
-	percent: 79 #<number>
+	percent: 85 #<number>
 
 	# Show or hide status items
 	signal: true #<boolean>
