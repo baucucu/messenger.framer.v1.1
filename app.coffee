@@ -151,7 +151,7 @@ batteryPercentage = new TextLayer
 # Search bar
 
 searchBar = new Layer
-	y: statusBar.height+3
+	y: statusBar.height + 3
 	width: Screen.width
 	backgroundColor: "transparent"
 	height: 32
