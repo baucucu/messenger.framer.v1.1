@@ -11,7 +11,7 @@ systemBackgroundColorInactive = "#DEDEDE"
 systemFontFamily = "-apple-system"
 
 # statusBar settings
-battery = "100%"
+battery = "85%"
 systemTime = "9:41 PM"
 signal = 5
 systemFontColor = "rgba(3,3,3,1)"
@@ -150,7 +150,6 @@ batteryPercentage = new TextLayer
 
 # Search bar
 
-# Search
 searchBar = new Layer
 	y: statusBar.height+3
 	width: Screen.width
@@ -200,6 +199,7 @@ compose = new Layer
 	superLayer: searchBar
 
 # Tab bar
+
 tabBar = new Layer
 	y: statusBar.height + searchBar.height + 6
 	width: Screen.width
@@ -471,6 +471,7 @@ gamesIcon.states =
 		image: "images/meIcon.png"
 
 # Home
+
 home = new ScrollComponent
 	size: Screen.size
 	backgroundColor: "white"
