@@ -2,10 +2,10 @@ class UsersDAL
     url = "https://fbusers-4494.restdb.io/rest/fbusers"
     apikey = "5956382dafce09e87211e986"
 
-    users = []
+    # users = []
 
     getUsers: (query, max, filter, sort, sortDir) ->
-        GETdata = "#{url}?apikey=#{apikey}&max=#{max}&sort=#{sort}&dir={sortDir}&filter=#{filter}&q="+JSON.stringify(query)
+        GETdata = "#{url}?apikey=#{apikey}&max=#{max}&sort=#{sort}&dir={sortDir}&filter=#{filter}&idtolink=true&q="+JSON.stringify(query)
         # load data from db
         users = JSON.parse Utils.domLoadDataSync GETdata
         return users
@@ -13,7 +13,7 @@ class UsersDAL
     getActiveUsers: (users) ->
         activeUsers = []
         for user in users
-	        if user.activity == true
+	        if user.status is "active"
 		        activeUsers.push(user)
         return activeUsers
 

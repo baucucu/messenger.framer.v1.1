@@ -1,656 +1,37 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var MasterLayout, UsersDAL, ios, masterLayout, messenger;
+var MasterLayout, ios, masterLayout, messenger, users, usersDB, usersModule;
 
 ios = require('ios-kit');
 
-UsersDAL = require("ipz-dal-usersDAL");
-
 MasterLayout = require("ipz-master-layout");
 
+usersModule = require("ipz-dal-usersDAL");
+
 Framer.Device.customize({
-  deviceType: Framer.Device.Type.Tablet,
+  deviceType: "apple-iphone-6s-plus-space-gray",
   screenWidth: 750,
   screenHeight: 1334,
   devicePixelRatio: 1
 });
 
+Framer.Defaults.Layer.force2d = true;
+
+ios.device.name = "iphone-6s";
+
 Screen.backgroundColor = "white";
+
+usersDB = new usersModule;
+
+users = usersDB.getUsers({}, 20, "", "serialno", -1);
 
 masterLayout = new MasterLayout;
 
 messenger = masterLayout.openApp("Messenger");
 
-messenger.login("Andy", "images/Ethan.png");
+messenger.login(users[0]);
 
 
-},{"ios-kit":18,"ipz-dal-usersDAL":19,"ipz-master-layout":20}],2:[function(require,module,exports){
-
-/*
-	 * USING STATUSBARLAYER
-
-	 * Require the module
-	StatusBarLayer = require "StatusBarLayer"
-
-	myStatusBar = new StatusBarLayer
-		 * iOS version
-		version: <number> (10 || 11)
-
-		 * Text
-		carrier: <string>
-		time: <string> # if not set, will use local time
-		percent: <number>
-
-		 * Show or hide status items
-		signal: <boolean>
-		wifi: <boolean>
-		powered: <boolean>
-		showPercentage: <boolean>
-		ipod: <boolean> # also affects signal and carrier
-
-		 * Colors
-		style: <string> ("light" || "dark")
-		foregroundColor: <string> (hex or rgba)
-		backgroundColor: <string> (hex or rgba)
-		vibrant: <boolean>
-
-		 * Behavior
-		hide: <boolean> # initial visibility
-		autoHide: <boolean> # hide in landscape where device-appropriate
-
-		 * Simulate call
-		myStatusBar.startCall(message, color) # <string>, <string> (hex or rgba)
-		myStatusBar.endCall()
-
-		 * Check visibility and call status
-		print myStatusBar.hidden
-		print myStatusBar.onCall
- */
-var StatusBarLayer, defaults,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-defaults = {
-  style: "light",
-  powered: false,
-  carrier: "Carrier",
-  foregroundColor: "",
-  backgroundColor: "",
-  time: "",
-  percent: 100,
-  showPercentage: true,
-  wifi: true,
-  signal: true,
-  ipod: false,
-  hide: false,
-  autoHide: true,
-  onCall: false,
-  vibrant: false,
-  version: 11
-};
-
-StatusBarLayer = (function(superClass) {
-  var batteryGreen, onCallColor;
-
-  extend(StatusBarLayer, superClass);
-
-  batteryGreen = "#4cd964";
-
-  onCallColor = "#4cd964";
-
-  function StatusBarLayer(options) {
-    var alarmMargin, baseFontSize, battery, batteryColor, battery_v10_2x, battery_v10_3x, battery_v11_2x, battery_v11_3x, carrier, carrierMargin, colorBattery, colorForeground, device, fontWeight, foregroundItems, getBatteryLevel, getBatteryMargin, getBatterySVG, getBatteryWidth, getOnCallMargin, getSignalSVG, getTime, getTopMargin, i, ipodMargin, isiPhonePlus, layer, len, letterSpacing, locationMargin, onCallBlock, onCallFontSize, onCallLetterSpacing, onCallMargin, onCallMessage, onCallWordSpacing, percentage, percentageMargin, power, powerMargin, powerSVG, ref, selectForegroundColor, signal, signalMargin, signal_v10_2x, signal_v10_3x, signal_v11_2x, signal_v11_3x, statusBarHeight, styleBar, svg, time, timeFontWeight, topMargin, updateOrientation, wifi, wifiMargin, wifiSVG;
-    this.options = options != null ? options : {};
-    this.options = _.assign({}, defaults, this.options);
-    fontWeight = 400;
-    timeFontWeight = 600;
-    isiPhonePlus = function() {
-      if (_.includes(Framer.Device.deviceType, "plus")) {
-        return true;
-      } else {
-        return false;
-      }
-    };
-    StatusBarLayer.__super__.constructor.call(this, this.options);
-    getTopMargin = (function(_this) {
-      return function() {
-        switch (isiPhonePlus()) {
-          case true:
-            return 8;
-          default:
-            return 5;
-        }
-      };
-    })(this);
-    getOnCallMargin = (function(_this) {
-      return function() {
-        switch (isiPhonePlus()) {
-          case true:
-            return 53;
-          default:
-            return 38;
-        }
-      };
-    })(this);
-    getBatteryMargin = (function(_this) {
-      return function() {
-        if (_this.options.powered === false) {
-          if (isiPhonePlus() && _this.options.version > 10) {
-            return 5;
-          } else {
-            return 5.5;
-          }
-        } else {
-          return 2.5;
-        }
-      };
-    })(this);
-    getBatteryWidth = (function(_this) {
-      return function() {
-        if (_this.options.version > 10 && isiPhonePlus()) {
-          return 26;
-        } else if (_this.options.version > 10) {
-          return 26.5;
-        } else {
-          return 24.5;
-        }
-      };
-    })(this);
-    getBatterySVG = (function(_this) {
-      return function() {
-        var size;
-        size = isiPhonePlus() ? "at3x" : "at2x";
-        return svg["battery"]["v" + _this.options.version][size];
-      };
-    })(this);
-    getSignalSVG = (function(_this) {
-      return function() {
-        var size;
-        size = isiPhonePlus() ? "at3x" : "at2x";
-        return svg["signal"]["v" + _this.options.version][size];
-      };
-    })(this);
-    statusBarHeight = 20;
-    topMargin = getTopMargin();
-    onCallMargin = topMargin + getOnCallMargin();
-    carrierMargin = isiPhonePlus() ? 2 : 4.5;
-    signalMargin = isiPhonePlus() ? 6 : 6.5;
-    wifiMargin = isiPhonePlus() ? -4 : 4;
-    powerMargin = 5.5;
-    percentageMargin = 2.5;
-    alarmMargin = 6.5;
-    locationMargin = 6;
-    ipodMargin = 6;
-    baseFontSize = 12;
-    onCallFontSize = 13.5;
-    letterSpacing = isiPhonePlus() ? 2 : 0;
-    onCallLetterSpacing = 0;
-    onCallWordSpacing = 0;
-    this.height = statusBarHeight;
-    if (this.options.ipod === true) {
-      this.options.carrier = "iPod";
-      this.options.signal = false;
-    }
-    if (this.options.powered === true) {
-      batteryColor = batteryGreen;
-    } else {
-      batteryColor = this.options.foregroundColor;
-    }
-    getBatteryLevel = (function(_this) {
-      return function(defaultBatteryWidth) {
-        var percentageWidth;
-        percentageWidth = _this.options.percent / 100 * defaultBatteryWidth;
-        percentageWidth = Math.round(percentageWidth);
-        return percentageWidth;
-      };
-    })(this);
-    signal_v10_2x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 16'><circle cx='2.75' cy='2.75' r='2.75' fill='" + this.options.foregroundColor + "' /><circle cx='9.75' cy='2.75' r='2.75' fill='" + this.options.foregroundColor + "' /><circle cx='16.75' cy='2.75' r='2.75' fill='" + this.options.foregroundColor + "' /><circle cx='23.75' cy='2.75' r='2.75' fill='" + this.options.foregroundColor + "' /><circle cx='30.75' cy='2.75' r='2.5' stroke='" + this.options.foregroundColor + "' stroke-width='0.5' fill-opacity='0' class='stroked' /></svg>";
-    signal_v11_2x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 33 33'><rect x='0' y='11' width='6' height='9' rx='2' fill='" + this.options.foregroundColor + "' /><rect x='9' y='8' width='6' height='12' rx='2' fill='" + this.options.foregroundColor + "' /><rect x='18' y='4' width='6' height='16' rx='2' fill='" + this.options.foregroundColor + "' /><rect x='27' y='0' width='6' height='20' rx='2' fill='" + this.options.foregroundColor + "' /></svg>";
-    signal_v10_3x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 67 32'><circle cx='5.5' cy='5.5' r='5.5' fill='" + this.options.foregroundColor + "' /><circle cx='19.5' cy='5.5' r='5.5' fill='" + this.options.foregroundColor + "' /><circle cx='33.5' cy='5.5' r='5.5' fill='" + this.options.foregroundColor + "' /><circle cx='47.5' cy='5.5' r='5.5' fill='" + this.options.foregroundColor + "' /><path d='M61.5,1A4.5,4.5,0,1,1,57,5.5,4.51,4.51,0,0,1,61.5,1m0-1A5.5,5.5,0,1,0,67,5.5,5.5,5.5,0,0,0,61.5,0Z' fill='" + this.options.foregroundColor + "' /></svg>";
-    signal_v11_3x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 49.5 60'><rect x='0' y='17' width='9' height='13' rx='3' fill='" + this.options.foregroundColor + "' /><rect x='13' y='12' width='9' height='18' rx='3' fill='" + this.options.foregroundColor + "' /><rect x='26' y='6' width='9' height='24' rx='3' fill='" + this.options.foregroundColor + "' /><rect x='39' y='0' width='9' height='30' rx='3' fill='" + this.options.foregroundColor + "' /></svg>";
-    wifiSVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 36'><path d='M 8.085 13.63 L 11.995 18 L 15.905 13.63 C 13.752 11.454 10.238 11.454 8.085 13.63 Z M 4.085 9.16 L 6.085 11.39 C 9.376 8.192 14.614 8.192 17.905 11.39 L 19.905 9.16 C 15.479 4.943 8.521 4.943 4.095 9.16 Z M 11.995 0 C 7.576 0.001 3.322 1.681 0.095 4.7 L 2.095 6.93 C 7.659 1.691 16.341 1.691 21.905 6.93 L 23.905 4.7 C 20.676 1.678 16.418 -0.002 11.995 0 Z' fill='" + this.options.foregroundColor + "' /></svg>";
-    battery_v10_2x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 49 32'><rect x='0.5' y='0.5'  width='44' height='18' rx='3' ry='3' stroke='" + this.options.foregroundColor + "' fill-opacity='0' class='stroked' /><rect x='2' y='2' width='" + (getBatteryLevel(41)) + "' height='15' rx='1.5' ry='1.5' fill='" + batteryColor + "' id='batteryFill' /><path d='M46,6v7a3.28,3.28,0,0,0,3-3.5A3.28,3.28,0,0,0,46,6Z' fill='" + this.options.foregroundColor + "'/></svg>";
-    battery_v11_2x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 53 32'><rect fill='" + this.options.foregroundColor + "' x='4' y='4' width='" + (getBatteryLevel(40)) + "' height='15' rx='2' /><rect stroke='" + this.options.foregroundColor + "' fill-opacity='0' class='stroked' stroke-width='2' opacity='0.4' x='1' y='1' width='46' height='21' rx='5' /><path d='M50,7.25605856 C51.7477886,7.87381317 53,9.54067176 53,11.5 C53,13.4593282 51.7477886,15.1261868 50,15.7439414 L50,7.25605856 Z' fill='" + this.options.foregroundColor + "' opacity='0.4' /></svg>";
-    battery_v10_3x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 73 42'><path d='M62,0H5A5,5,0,0,0,0,5V24a5,5,0,0,0,5,5H62a5,5,0,0,0,5-5V5A5,5,0,0,0,62,0Zm4,24a4,4,0,0,1-4,4H5a4,4,0,0,1-4-4V5A4,4,0,0,1,5,1H62a4,4,0,0,1,4,4Z' fill='" + this.options.foregroundColor + "' /><rect x='2' y='2' width='" + (getBatteryLevel(63)) + "' height='25' rx='3' ry='3' fill='" + batteryColor + "' id='batteryFill' /><path d='M69,10.06v9.89A4.82,4.82,0,0,0,73,15,4.82,4.82,0,0,0,69,10.06Z' fill='" + this.options.foregroundColor + "' /></svg>";
-    battery_v11_3x = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 78 42'><rect fill='" + batteryColor + "' id='batteryFill' x='6' y='6' width='" + (getBatteryLevel(59)) + "' height='22' rx='3' /><rect stroke='" + this.options.foregroundColor + "' fill-opacity='0' class='stroked' stroke-width='3' opacity='0.4' x='1.5' y='1.5' width='68' height='31' rx='7.5' /><path d='M 74 10.674 C 76.365 11.797 78 14.208 78 17 C 78 19.792 76.365 22.203 74 23.326 L 74 10.674 Z' fill='" + this.options.foregroundColor + "' opacity='0.4'/></svg>";
-    powerSVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 6 17'><polygon points='6 3.75 3.43 3.75 4.5 0 0.5 5.25 2.98 5.25 1.5 9.5 6 3.75' fill='" + this.options.foregroundColor + "' /></svg>";
-    svg = {
-      battery: {
-        v10: {
-          at2x: battery_v10_2x,
-          at3x: battery_v10_3x
-        },
-        v11: {
-          at2x: battery_v11_2x,
-          at3x: battery_v11_3x
-        }
-      },
-      signal: {
-        v10: {
-          at2x: signal_v10_2x,
-          at3x: signal_v10_3x
-        },
-        v11: {
-          at2x: signal_v11_2x,
-          at3x: signal_v11_3x
-        }
-      },
-      wifi: wifiSVG,
-      power: powerSVG
-    };
-    onCallBlock = new Layer({
-      parent: this,
-      name: "onCallBlock",
-      height: statusBarHeight
-    });
-    this.onCallBlock = onCallBlock;
-    onCallMessage = new TextLayer({
-      parent: this,
-      name: "onCallMessage",
-      padding: {
-        top: onCallMargin
-      },
-      text: "",
-      fontSize: onCallFontSize,
-      fontWeight: fontWeight,
-      textAlign: "center",
-      color: "white",
-      letterSpacing: onCallLetterSpacing,
-      wordSpacing: onCallWordSpacing
-    });
-    this.onCallMessage = onCallMessage;
-    carrier = new TextLayer({
-      parent: this,
-      name: "carrier",
-      padding: {
-        top: getTopMargin()
-      },
-      text: this.options.carrier,
-      fontSize: baseFontSize,
-      fontWeight: fontWeight,
-      letterSpacing: letterSpacing
-    });
-    this.carrier = carrier;
-    signal = new Layer({
-      parent: this,
-      name: "signal",
-      width: this.options.version > 10 ? 16.5 : 34,
-      height: this.options.version > 10 ? 10 : 6,
-      y: Align.center,
-      html: getSignalSVG()
-    });
-    this.signal = signal;
-    wifi = new Layer({
-      parent: this,
-      name: "wifi",
-      y: Align.center,
-      width: 13,
-      height: 9,
-      html: wifiSVG
-    });
-    this.wifi = wifi;
-    getTime = (function(_this) {
-      return function() {
-        var day, hour, minute, second, suffix, today;
-        today = new Date;
-        day = today.getDay();
-        hour = today.getHours();
-        minute = today.getMinutes();
-        second = today.getSeconds();
-        suffix = hour >= 12 ? ' PM' : ' AM';
-        hour = hour > 12 ? hour - 12 : hour;
-        minute = minute < 10 ? "0" + minute : minute;
-        if (_this.options.time === "") {
-          return hour + ':' + minute + suffix;
-        } else {
-          return _this.options.time;
-        }
-      };
-    })(this);
-    time = new TextLayer({
-      parent: this,
-      name: "time",
-      width: this.width,
-      padding: {
-        top: getTopMargin()
-      },
-      text: getTime(),
-      fontSize: baseFontSize,
-      fontWeight: timeFontWeight,
-      textAlign: "center",
-      letterSpacing: letterSpacing
-    });
-    this.time = time;
-    power = new Layer({
-      parent: this,
-      name: "power",
-      y: Align.center,
-      width: 5.5,
-      height: 9.5,
-      html: powerSVG
-    });
-    this.power = power;
-    battery = new Layer({
-      parent: this,
-      name: "battery",
-      y: Align.center,
-      width: getBatteryWidth(),
-      height: this.options.version > 10 ? 11.5 : 9,
-      html: getBatterySVG()
-    });
-    this.battery = battery;
-    percentage = new TextLayer({
-      parent: this,
-      name: "percentage",
-      padding: {
-        top: getTopMargin()
-      },
-      text: this.options.percent + "%",
-      fontSize: baseFontSize,
-      fontWeight: fontWeight,
-      textAlign: "right",
-      letterSpacing: letterSpacing
-    });
-    this.percentage = percentage;
-    ref = this.subLayers;
-    for (i = 0, len = ref.length; i < len; i++) {
-      layer = ref[i];
-      layer.backgroundColor = "clear";
-    }
-    this.hide = (function(_this) {
-      return function() {
-        _this.options.hide = true;
-        return _this.animate({
-          properties: {
-            y: 0 - statusBarHeight
-          },
-          time: 0.25
-        });
-      };
-    })(this);
-    this.show = (function(_this) {
-      return function() {
-        _this.options.hide = false;
-        return _this.animate({
-          properties: {
-            y: 0
-          },
-          time: 0.25
-        });
-      };
-    })(this);
-    this.layout = (function(_this) {
-      return function() {
-        _this.width = Screen.width;
-        if (_this.options.hide === true) {
-          _this.hide();
-        } else if (_this.options.autoHide === true) {
-          if (Framer.Device.orientation > 0 && (Screen.width === 2208 || Screen.width === 1334 || Screen.width === 1136 || Screen.width === 736 || Screen.width === 667)) {
-            _this.hide();
-          }
-        } else {
-          _this.show();
-        }
-        if (_this.options.carrier === "") {
-          carrierMargin = 0;
-        }
-        if (_this.options.signal === true) {
-          signal.visible = true;
-          signal.x = signalMargin;
-          carrier.x = signal.x + signal.width + carrierMargin;
-        } else {
-          signal.visible = false;
-          carrier.x = ipodMargin;
-        }
-        if (_this.options.wifi === true) {
-          wifi.visible = true;
-        } else {
-          wifi.visible = false;
-        }
-        wifi.x = carrier.x + carrier.width + wifiMargin;
-        time.width = Screen.width;
-        onCallBlock.width = Screen.width;
-        onCallMessage.width = Screen.width;
-        if (_this.options.powered === true) {
-          power.x = Align.right(-powerMargin);
-        } else {
-          power.x = Screen.width;
-        }
-        battery.x = power.x - battery.width - getBatteryMargin();
-        if (_this.options.showPercentage === false) {
-          percentageMargin = 0;
-          percentage.text = "";
-        } else {
-          percentage.text = _this.options.percent + "%";
-        }
-        return percentage.maxX = battery.x - percentageMargin;
-      };
-    })(this);
-    getTime();
-    this.layout();
-    foregroundItems = [percentage, power, time, wifi, signal, carrier, battery];
-    selectForegroundColor = (function(_this) {
-      return function() {
-        if (_this.options.foregroundColor === "") {
-          if (_this.options.style === "dark") {
-            return "white";
-          } else {
-            return "black";
-          }
-        } else {
-          return _this.options.foregroundColor;
-        }
-      };
-    })(this);
-    colorForeground = (function(_this) {
-      return function(color) {
-        var SVG, j, k, layerSVG, len1, len2, results, strokedSVG;
-        if (color == null) {
-          color = "";
-        }
-        if (color === "") {
-          color = selectForegroundColor();
-        }
-        results = [];
-        for (j = 0, len1 = foregroundItems.length; j < len1; j++) {
-          layer = foregroundItems[j];
-          layer.color = color;
-          layerSVG = layer.querySelectorAll('path, circle, rect, polygon');
-          strokedSVG = layer.querySelectorAll('.stroked');
-          for (k = 0, len2 = layerSVG.length; k < len2; k++) {
-            SVG = layerSVG[k];
-            SVG.setAttribute('fill', color);
-          }
-          results.push((function() {
-            var l, len3, results1;
-            results1 = [];
-            for (l = 0, len3 = strokedSVG.length; l < len3; l++) {
-              SVG = strokedSVG[l];
-              SVG.setAttribute('stroke', color);
-              results1.push(SVG.setAttribute('fill-opacity', '0'));
-            }
-            return results1;
-          })());
-        }
-        return results;
-      };
-    })(this);
-    colorBattery = (function(_this) {
-      return function() {
-        var SVG, batteryFillSVG, j, k, l, len1, len2, len3, results, results1, results2;
-        batteryFillSVG = layer.querySelectorAll('#batteryFill');
-        if (_this.options.onCall === true) {
-          results = [];
-          for (j = 0, len1 = batteryFillSVG.length; j < len1; j++) {
-            SVG = batteryFillSVG[j];
-            SVG.style.WebkitTransition = 'all 0.25s';
-            results.push(SVG.setAttribute('fill', "white"));
-          }
-          return results;
-        } else if (_this.options.powered === true) {
-          results1 = [];
-          for (k = 0, len2 = batteryFillSVG.length; k < len2; k++) {
-            SVG = batteryFillSVG[k];
-            SVG.style.WebkitTransition = 'all 0.25s';
-            results1.push(SVG.setAttribute('fill', batteryGreen));
-          }
-          return results1;
-        } else {
-          results2 = [];
-          for (l = 0, len3 = batteryFillSVG.length; l < len3; l++) {
-            SVG = batteryFillSVG[l];
-            SVG.style.WebkitTransition = 'all 0.25s';
-            results2.push(SVG.setAttribute('fill', selectForegroundColor()));
-          }
-          return results2;
-        }
-      };
-    })(this);
-    styleBar = (function(_this) {
-      return function(style, backgroundColor) {
-        var barColor;
-        if (backgroundColor == null) {
-          backgroundColor = "";
-        }
-        if (backgroundColor === "") {
-          _this.style = {
-            "-webkit-backdrop-filter": "blur(60px)"
-          };
-          if (style === "dark") {
-            _this.backgroundColor = "rgba(0, 0, 0, 0.5)";
-          } else {
-            _this.backgroundColor = "rgba(255, 255, 255, 0.5)";
-          }
-        } else {
-          _this.backgroundColor = backgroundColor;
-        }
-        if (_this.options.vibrant === true) {
-          barColor = new Color(backgroundColor).alpha(.5);
-          _this.backgroundColor = barColor;
-          return _this.style = {
-            "-webkit-backdrop-filter": "blur(60px)"
-          };
-        }
-      };
-    })(this);
-    this.applyStyle = (function(_this) {
-      return function(style, foregroundColor, backgroundColor) {
-        if (style == null) {
-          style = _this.options.style;
-        }
-        if (foregroundColor == null) {
-          foregroundColor = _this.options.foregroundColor;
-        }
-        if (backgroundColor == null) {
-          backgroundColor = _this.options.backgroundColor;
-        }
-        if (style === "light" && foregroundColor === "") {
-          foregroundColor = "black";
-        }
-        if (style === "dark" && foregroundColor === "") {
-          foregroundColor = "white";
-        }
-        styleBar(style, backgroundColor);
-        colorForeground();
-        return colorBattery();
-      };
-    })(this);
-    this.applyStyle();
-    this.startCall = (function(_this) {
-      return function(message, color) {
-        if (message == null) {
-          message = "Touch to return to call 0:30";
-        }
-        if (color == null) {
-          color = onCallColor;
-        }
-        _this.options.onCall = true;
-        colorForeground("white");
-        colorBattery();
-        onCallBlock.animate({
-          properties: {
-            backgroundColor: color,
-            opacity: 1,
-            height: statusBarHeight * 2
-          },
-          time: 0.25
-        });
-        return onCallBlock.onAnimationEnd(function() {
-          if (_this.options.onCall === true) {
-            return onCallMessage.text = message;
-          }
-        });
-      };
-    })(this);
-    this.endCall = (function(_this) {
-      return function() {
-        _this.options.onCall = false;
-        onCallMessage.text = "";
-        onCallBlock.animate({
-          properties: {
-            opacity: 0,
-            height: statusBarHeight
-          },
-          time: 0.25
-        });
-        return _this.applyStyle();
-      };
-    })(this);
-    updateOrientation = (function(_this) {
-      return function(device) {
-        var deviceOrientation, deviceRotation, rotation, value;
-        value = device === "Framer" ? Framer.Device.orientation : window.orientation;
-        if (value < 0 && device === "Framer") {
-          value = Math.abs(value);
-        }
-        rotation = (function() {
-          switch (false) {
-            case value !== 0:
-              return deviceRotation = "Portrait";
-            case value !== 180:
-              return deviceRotation = "Portrait (Upside-Down)";
-            case value !== -90:
-              return deviceRotation = "Landscape (Clockwise)";
-            case value !== 90:
-              return deviceRotation = "Landscape (Counterclockwise)";
-          }
-        })();
-        deviceOrientation = deviceRotation;
-        return _this.layout();
-      };
-    })(this);
-    if (Utils.isMobile()) {
-      device = "mobile";
-      window.addEventListener("orientationchange", function() {
-        return updateOrientation(device);
-      });
-    } else {
-      Framer.Device.on("change:orientation", function() {
-        device = "Framer";
-        return updateOrientation(device);
-      });
-    }
-  }
-
-  StatusBarLayer.define('hidden', {
-    get: function() {
-      return this.options.hide;
-    }
-  });
-
-  StatusBarLayer.define('onCall', {
-    get: function() {
-      return this.options.onCall;
-    }
-  });
-
-  return StatusBarLayer;
-
-})(Layer);
-
-module.exports = StatusBarLayer;
-
-
-},{}],3:[function(require,module,exports){
+},{"ios-kit":17,"ipz-dal-usersDAL":18,"ipz-master-layout":19}],2:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -926,7 +307,7 @@ exports.create = function(obj) {
 };
 
 
-},{"ios-kit":18}],4:[function(require,module,exports){
+},{"ios-kit":17}],3:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -1125,7 +506,7 @@ exports.create = function(obj) {
 };
 
 
-},{"ios-kit":18}],5:[function(require,module,exports){
+},{"ios-kit":17}],4:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -1325,7 +706,7 @@ exports.create = function(array) {
 };
 
 
-},{"ios-kit":18}],6:[function(require,module,exports){
+},{"ios-kit":17}],5:[function(require,module,exports){
 var genCSS, ios;
 
 ios = require('ios-kit');
@@ -1865,7 +1246,7 @@ exports.convert = function(obj) {
 };
 
 
-},{"ios-kit":18}],7:[function(require,module,exports){
+},{"ios-kit":17}],6:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -2007,7 +1388,7 @@ exports.create = function(array) {
 };
 
 
-},{"ios-kit":18}],8:[function(require,module,exports){
+},{"ios-kit":17}],7:[function(require,module,exports){
 var arrayOfCodes, codeMap, device, ios, letters, numbers, symbols;
 
 ios = require('ios-kit');
@@ -3317,7 +2698,7 @@ exports.create = function(obj) {
 };
 
 
-},{"ios-kit":18}],9:[function(require,module,exports){
+},{"ios-kit":17}],8:[function(require,module,exports){
 var ios, layout;
 
 ios = require('ios-kit');
@@ -3584,7 +2965,7 @@ exports.animate = function(array) {
 };
 
 
-},{"ios-kit":18}],10:[function(require,module,exports){
+},{"ios-kit":17}],9:[function(require,module,exports){
 var ios, layer;
 
 ios = require("ios-kit");
@@ -4061,7 +3442,7 @@ exports.realDevices = {
 };
 
 
-},{"ios-kit":18}],11:[function(require,module,exports){
+},{"ios-kit":17}],10:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -4243,7 +3624,7 @@ exports.create = function(array) {
 };
 
 
-},{"ios-kit":18}],12:[function(require,module,exports){
+},{"ios-kit":17}],11:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -4489,7 +3870,7 @@ exports.create = function(array) {
 };
 
 
-},{"ios-kit":18}],13:[function(require,module,exports){
+},{"ios-kit":17}],12:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -4757,7 +4138,7 @@ exports.create = function(array) {
 };
 
 
-},{"ios-kit":18}],14:[function(require,module,exports){
+},{"ios-kit":17}],13:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -5007,7 +4388,7 @@ exports.bar = function(array) {
 };
 
 
-},{"ios-kit":18}],15:[function(require,module,exports){
+},{"ios-kit":17}],14:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -5126,7 +4507,7 @@ exports.create = function(array) {
 };
 
 
-},{"ios-kit":18}],16:[function(require,module,exports){
+},{"ios-kit":17}],15:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -5650,7 +5031,7 @@ exports.write = function(obj, text) {
 };
 
 
-},{"ios-kit":18}],17:[function(require,module,exports){
+},{"ios-kit":17}],16:[function(require,module,exports){
 var ios;
 
 ios = require('ios-kit');
@@ -5677,7 +5058,7 @@ exports.create = function(obj) {
 };
 
 
-},{"ios-kit":18}],18:[function(require,module,exports){
+},{"ios-kit":17}],17:[function(require,module,exports){
 var conv, layout, library, utils;
 
 exports.layout = layout = require('ios-kit-layout');
@@ -5773,11 +5154,11 @@ exports.View = exports.view.create;
 exports.l = {};
 
 
-},{"ios-kit-alert":3,"ios-kit-banner":4,"ios-kit-button":5,"ios-kit-converter":6,"ios-kit-field":7,"ios-kit-keyboard":8,"ios-kit-layout":9,"ios-kit-library":10,"ios-kit-nav-bar":11,"ios-kit-sheet":12,"ios-kit-status-bar":13,"ios-kit-tab-bar":14,"ios-kit-text":15,"ios-kit-utils":16,"ios-kit-view":17}],19:[function(require,module,exports){
+},{"ios-kit-alert":2,"ios-kit-banner":3,"ios-kit-button":4,"ios-kit-converter":5,"ios-kit-field":6,"ios-kit-keyboard":7,"ios-kit-layout":8,"ios-kit-library":9,"ios-kit-nav-bar":10,"ios-kit-sheet":11,"ios-kit-status-bar":12,"ios-kit-tab-bar":13,"ios-kit-text":14,"ios-kit-utils":15,"ios-kit-view":16}],18:[function(require,module,exports){
 var UsersDAL;
 
 UsersDAL = (function() {
-  var apikey, url, users;
+  var apikey, url;
 
   function UsersDAL() {}
 
@@ -5785,11 +5166,9 @@ UsersDAL = (function() {
 
   apikey = "5956382dafce09e87211e986";
 
-  users = [];
-
   UsersDAL.prototype.getUsers = function(query, max, filter, sort, sortDir) {
-    var GETdata;
-    GETdata = (url + "?apikey=" + apikey + "&max=" + max + "&sort=" + sort + "&dir={sortDir}&filter=" + filter + "&q=") + JSON.stringify(query);
+    var GETdata, users;
+    GETdata = (url + "?apikey=" + apikey + "&max=" + max + "&sort=" + sort + "&dir={sortDir}&filter=" + filter + "&idtolink=true&q=") + JSON.stringify(query);
     users = JSON.parse(Utils.domLoadDataSync(GETdata));
     return users;
   };
@@ -5799,7 +5178,7 @@ UsersDAL = (function() {
     activeUsers = [];
     for (i = 0, len = users.length; i < len; i++) {
       user = users[i];
-      if (user.activity === true) {
+      if (user.status === "active") {
         activeUsers.push(user);
       }
     }
@@ -5849,14 +5228,12 @@ UsersDAL = (function() {
 })();
 
 
-},{}],20:[function(require,module,exports){
-var IpzMessenger, MasterLayout, StatusBarLayer, ios;
+},{}],19:[function(require,module,exports){
+var IpzMessenger, MasterLayout, ios;
 
 ios = require('ios-kit');
 
 IpzMessenger = require("ipz-messenger");
-
-StatusBarLayer = require("StatusBarLayer");
 
 MasterLayout = (function() {
   MasterLayout.contentView = void 0;
@@ -5869,22 +5246,22 @@ MasterLayout = (function() {
     });
     statusBar = new ios.StatusBar({
       superLayer: mainView,
-      width: Screen.width
+      width: Screen.width,
+      carrier: "VodafoneRO"
     });
     this.contentView = new ios.View({
-      y: statusBar.height,
+      y: statusBar.height * 0.65,
       width: Screen.width,
-      height: Screen.height - statusBar.height,
-      backgroundColor: "red"
+      backgroundColor: Screen.backgroundColor
     });
   }
 
   MasterLayout.prototype.openApp = function(appName) {
-    var openedApp;
+    var app;
     switch (appName) {
       case "Messenger":
-        openedApp = new IpzMessenger(this.contentView);
-        return openedApp;
+        app = new IpzMessenger(this.contentView);
+        return app;
     }
   };
 
@@ -5895,70 +5272,341 @@ MasterLayout = (function() {
 module.exports = MasterLayout;
 
 
-},{"StatusBarLayer":2,"ios-kit":18,"ipz-messenger":23}],21:[function(require,module,exports){
-var IpzMessengerHeader, IpzMessengerSearchBox, ios;
+},{"ios-kit":17,"ipz-messenger":26}],20:[function(require,module,exports){
+var IpzMessengerCalls, IpzMessengerSearchBox, ios, ipz;
 
 ios = require('ios-kit');
 
+ipz = require('ipz-messenger-kit');
+
 IpzMessengerSearchBox = require("ipz-messenger-searchBox");
 
-IpzMessengerHeader = (function() {
-  IpzMessengerHeader.height = 64;
+IpzMessengerCalls = (function() {
+  IpzMessengerCalls.header = void 0;
 
-  IpzMessengerHeader.header = void 0;
+  IpzMessengerCalls.flow = void 0;
 
-  function IpzMessengerHeader(parentView, height) {
-    var activeNowTab, compose, groupsTab, messagesTab, searchBox, tabBar;
-    this.height = height;
+  function IpzMessengerCalls(parentView) {
+    var searchBox;
     this.header = new ios.View({
       superLayer: parentView,
-      backgroundColor: "white",
       width: parentView.width,
-      height: this.height
+      height: 64,
+      backgroundColor: "white"
     });
     searchBox = new IpzMessengerSearchBox(this.header);
-    compose = new Layer({
-      image: "images/CreateIcon.png",
-      x: Align.right(-10),
-      width: 26,
-      height: 26,
-      superLayer: this.header
-    });
-    messagesTab = new ios.Tab({
-      label: "Messages"
-    });
-    activeNowTab = new ios.Tab({
-      label: "Active"
-    });
-    groupsTab = new ios.Tab({
-      label: "Groups"
-    });
-    tabBar = new ios.TabBar({
-      tabs: [messagesTab, activeNowTab, groupsTab],
-      activeColor: "#blue",
-      inactiveColor: "grey"
-    });
   }
 
-  IpzMessengerHeader.prototype.setAvatar = function(avatarImage) {
-    var avatar;
-    return avatar = new Layer({
-      image: avatarImage,
-      width: 26,
-      height: 26,
-      superLayer: this.header,
-      x: Align.left(10)
-    });
-  };
-
-  return IpzMessengerHeader;
+  return IpzMessengerCalls;
 
 })();
 
-module.exports = IpzMessengerHeader;
+module.exports = IpzMessengerCalls;
 
 
-},{"ios-kit":18,"ipz-messenger-searchBox":22}],22:[function(require,module,exports){
+},{"ios-kit":17,"ipz-messenger-kit":22,"ipz-messenger-searchBox":24}],21:[function(require,module,exports){
+var IpzMessengerHome, ios, ipz, usersModule;
+
+ios = require('ios-kit');
+
+ipz = require('ipz-messenger-kit');
+
+usersModule = require("ipz-dal-usersDAL");
+
+IpzMessengerHome = (function() {
+  IpzMessengerHome.header = void 0;
+
+  IpzMessengerHome.flow = void 0;
+
+  function IpzMessengerHome(parentView, users) {
+    var activeFriends, activeUsers, activeView, compose, groupsView, lastMessages, messagesView, navBar, otherMessages, searchBox, usersDB;
+    this.header = new ios.View({
+      superLayer: parentView,
+      width: parentView.width,
+      height: 128
+    });
+    navBar = new ipz.IpzMessengerNavBar({
+      superLayer: this.header,
+      left: "Messages",
+      center: "Active",
+      right: "Groups",
+      blur: false
+    });
+    searchBox = new ipz.IpzMessengerSearchBox(this.header);
+    compose = new Layer({
+      image: "images/CreateIcon.png",
+      x: Align.right(-10),
+      width: 52,
+      height: 52,
+      superLayer: this.header
+    });
+    messagesView = new ScrollComponent({
+      y: parentView.y + this.header.height,
+      width: parentView.width,
+      height: parentView.height - this.header.height,
+      scrollHorizontal: false
+    });
+    usersDB = new usersModule;
+    users = usersDB.getUsers({}, 20, "", "serialno", -1);
+    activeUsers = usersDB.getActiveUsers(users);
+    lastMessages = new ipz.IpzMessageList({
+      parent: messagesView.content
+    }, users.slice(0, 3));
+    activeFriends = new ipz.IpzActiveFriends({
+      parent: messagesView.content,
+      y: lastMessages.maxY + 8
+    }, activeUsers);
+    otherMessages = new ipz.IpzMessageList({
+      parent: messagesView.content,
+      y: activeFriends.maxY + 8
+    }, users.slice(5, 21));
+    activeView = new ios.View({
+      x: Screen.width,
+      y: parentView.y + this.header.height,
+      width: parentView.width,
+      height: parentView.height - this.header.height,
+      backgroundColor: "orange"
+    });
+    groupsView = new ios.View({
+      x: Screen.width,
+      y: parentView.y + this.header.height,
+      width: parentView.width,
+      height: parentView.height - this.header.height,
+      backgroundColor: "purple"
+    });
+    navBar.left.on(Events.Tap, function(event) {
+      messagesView.x = 0;
+      activeView.x = Screen.width;
+      return groupsView.x = Screen.width;
+    });
+    navBar.center.on(Events.Tap, function(event) {
+      messagesView.x = Screen.width;
+      activeView.x = 0;
+      return groupsView.x = Screen.width;
+    });
+    navBar.right.on(Events.Tap, function(event) {
+      messagesView.x = Screen.width;
+      activeView.x = Screen.width;
+      return groupsView.x = 0;
+    });
+  }
+
+  IpzMessengerHome.prototype.setAvatar = function(user) {
+    var avatar;
+    return avatar = new ipz.IpzAvatar({
+      scale: 0.7,
+      superLayer: this.header,
+      x: Align.left(10)
+    }, user);
+  };
+
+  return IpzMessengerHome;
+
+})();
+
+module.exports = IpzMessengerHome;
+
+
+},{"ios-kit":17,"ipz-dal-usersDAL":18,"ipz-messenger-kit":22}],22:[function(require,module,exports){
+var kit, nav, tab;
+
+nav = require('ipz-messenger-nav-bar');
+
+tab = require('ipz-messenger-tab-bar');
+
+kit = require('messenger-kit');
+
+exports.IpzMessengerHome = require("ipz-messenger-home");
+
+exports.IpzMessengerCalls = require("ipz-messenger-calls");
+
+exports.IpzMessengerSearchBox = require("ipz-messenger-searchBox");
+
+exports.IpzMessengerNavBar = nav.create;
+
+exports.IpzMessengerTab = tab.tab;
+
+exports.IpzMessengerTabBar = tab.bar;
+
+exports.IpzAvatar = kit.Avatar;
+
+exports.IpzMessageList = kit.MessageList;
+
+exports.IpzMessageListItem = kit.MessageListItem;
+
+exports.IpzActiveFriendsScrollList = kit.ActiveFriendsScrollList;
+
+exports.IpzActiveFriends = kit.ActiveFriends;
+
+
+},{"ipz-messenger-calls":20,"ipz-messenger-home":21,"ipz-messenger-nav-bar":23,"ipz-messenger-searchBox":24,"ipz-messenger-tab-bar":25,"messenger-kit":27}],23:[function(require,module,exports){
+var ios;
+
+ios = require('ios-kit');
+
+exports.defaults = {
+  left: void 0,
+  center: void 0,
+  right: "Edit",
+  blur: true,
+  superLayer: void 0,
+  type: "navBar",
+  activeColor: 'blue',
+  inactiveColor: 'grey',
+  backgroundColor: "rgba(255, 255, 255, .8)",
+  dividerBackgroundColor: "#B2B2B2"
+};
+
+exports.defaults.props = Object.keys(exports.defaults);
+
+exports.create = function(array) {
+  var bar, i, layer, len, ref, setup;
+  setup = ios.utils.setupComponent(array, exports.defaults);
+  bar = new ios.View({
+    name: "navBar",
+    backgroundColor: setup.backgroundColor,
+    constraints: {
+      leading: 0,
+      trailing: 0,
+      top: 0,
+      height: 64
+    }
+  });
+  bar.bg = new ios.View({
+    superLayer: bar,
+    backgroundColor: 'transparent',
+    name: ".bg",
+    constraints: {
+      leading: 0,
+      trailing: 0,
+      height: 44,
+      bottom: 0
+    }
+  });
+  bar.divider = new ios.View({
+    backgroundColor: setup.dividerBackgroundColor,
+    name: ".divider",
+    superLayer: bar.bg,
+    constraints: {
+      height: .5,
+      bottom: 0,
+      leading: 0,
+      trailing: 0
+    }
+  });
+  if (setup.superLayer) {
+    setup.superLayer.addSubLayer(bar);
+  }
+  if (setup.blur) {
+    ios.utils.bgBlur(bar);
+  }
+  if (setup.blur === false && setup.backgroundColor === "rgba(255, 255, 255, .8)") {
+    bar.backgroundColor = 'white';
+  }
+  bar.type = setup.type;
+  ref = Framer.CurrentContext.layers;
+  for (i = 0, len = ref.length; i < len; i++) {
+    layer = ref[i];
+    if (layer.type === "statusBar") {
+      this.statusBar = layer;
+      bar.placeBehind(this.statusBar);
+    }
+  }
+  if (typeof setup.left === "string" && typeof setup.left !== "boolean") {
+    bar.left = new ios.Button({
+      name: ".left",
+      superLayer: bar.bg,
+      text: setup.left,
+      color: setup.activeColor,
+      fontWeight: 500,
+      constraints: {
+        bottom: 12,
+        leading: 8
+      }
+    });
+    bar.left.type = "button";
+    ios.utils.specialChar(bar.left);
+  }
+  if (typeof setup.left === "object") {
+    bar.left = setup.left;
+    bar.left.name = ".left";
+    bar.left.superLayer = bar.bg;
+    bar.left.constraints = {
+      leading: 8,
+      bottom: 12
+    };
+    ios.layout.set(bar.left);
+  }
+  if (typeof setup.center === "string" && typeof setup.center !== "boolean") {
+    bar.center = new ios.Button({
+      name: ".center",
+      superLayer: bar.bg,
+      text: setup.center,
+      color: setup.inactiveColor,
+      fontWeight: 500,
+      constraints: {
+        bottom: 12,
+        align: "horizontal"
+      }
+    });
+    bar.center.type = "button";
+    ios.utils.specialChar(bar.center);
+  }
+  if (typeof setup.center === "object") {
+    bar.center = setup.center;
+    bar.center.name = ".right";
+    bar.center.superLayer = bar.bg;
+    bar.center.constraints = {
+      align: "horizontal",
+      bottom: 12
+    };
+    ios.layout.set(bar.center);
+  }
+  if (typeof setup.right === "string" && typeof setup.right !== "boolean") {
+    bar.right = new ios.Button({
+      name: ".right",
+      superLayer: bar.bg,
+      text: setup.right,
+      color: setup.inactiveColor,
+      fontWeight: 500,
+      constraints: {
+        bottom: 12,
+        trailing: 8
+      }
+    });
+    bar.right.type = "button";
+    ios.utils.specialChar(bar.right);
+  }
+  if (typeof setup.right === "object") {
+    bar.right = setup.right;
+    bar.right.name = ".right";
+    bar.right.superLayer = bar.bg;
+    bar.right.constraints = {
+      trailing: 8,
+      bottom: 12
+    };
+    ios.layout.set(bar.right);
+  }
+  bar.left.on(Events.TouchStart, function() {
+    bar.left.color = setup.activeColor;
+    bar.center.color = setup.inactiveColor;
+    return bar.right.color = setup.inactiveColor;
+  });
+  bar.center.on(Events.TouchStart, function() {
+    bar.left.color = setup.inactiveColor;
+    bar.center.color = setup.activeColor;
+    return bar.right.color = setup.inactiveColor;
+  });
+  bar.right.on(Events.TouchStart, function() {
+    bar.left.color = setup.inactiveColor;
+    bar.center.color = setup.inactiveColor;
+    return bar.right.color = setup.activeColor;
+  });
+  return bar;
+};
+
+
+},{"ios-kit":17}],24:[function(require,module,exports){
 var IpzMessengerSearchBox;
 
 IpzMessengerSearchBox = (function() {
@@ -5967,21 +5615,21 @@ IpzMessengerSearchBox = (function() {
     searchBar = new Layer({
       width: parentView.width,
       backgroundColor: "transparent",
-      height: 32,
+      height: 64,
       parent: parentView
     });
     search = new Layer({
-      width: searchBar.width - 100,
+      width: searchBar.width - 150,
       x: Align.center,
       superLayer: searchBar,
-      height: 28,
+      height: 56,
       borderRadius: 5,
       backgroundColor: "#DEDEDE"
     });
     searchPlaceholder = new TextLayer({
       parent: search,
       text: "Search",
-      fontSize: 14,
+      fontSize: 28,
       fontFamily: ".SF NS Display",
       letterSpacing: 0.0,
       x: Align.center,
@@ -5990,8 +5638,8 @@ IpzMessengerSearchBox = (function() {
     searchIcon = new Layer({
       parent: search,
       image: "images/SearchIcon.png",
-      height: 12,
-      width: 12,
+      height: 24,
+      width: 24,
       y: Align.center
     });
     searchIcon.x = searchPlaceholder.x - (searchIcon.width + 5);
@@ -6004,44 +5652,325 @@ IpzMessengerSearchBox = (function() {
 module.exports = IpzMessengerSearchBox;
 
 
-},{}],23:[function(require,module,exports){
-var IpzMessenger, IpzMessengerHeader, ios;
+},{}],25:[function(require,module,exports){
+var ios;
 
 ios = require('ios-kit');
 
-IpzMessengerHeader = require("ipz-messenger-header");
+exports.defaults = {
+  tab: {
+    label: "label",
+    activeIcon: void 0,
+    inactiveIcon: void 0,
+    active: void 0,
+    inactive: void 0,
+    type: "tab",
+    viewTop: 0,
+    viewBottom: 0
+  },
+  bar: {
+    tabs: [],
+    start: 0,
+    type: "tabBar",
+    backgroundColor: "white",
+    activeColor: "blue",
+    inactiveColor: "gray",
+    blur: true
+  }
+};
+
+exports.defaults.tab.props = Object.keys(exports.defaults.tab);
+
+exports.defaults.bar.props = Object.keys(exports.defaults.bar);
+
+exports.tab = function(array) {
+  var setup, specs, tab;
+  setup = ios.utils.setupComponent(array, exports.defaults.tab);
+  specs = {
+    width: 75
+  };
+  switch (ios.device.name) {
+    case "iphone-5":
+      specs.width = 55;
+  }
+  tab = new ios.View({
+    backgroundColor: "transparent",
+    name: setup.label,
+    constraints: {
+      width: specs.width,
+      height: 52
+    }
+  });
+  tab.view = new ios.View({
+    name: setup.label + ".view",
+    backgroundColor: "transparent",
+    constraints: {
+      top: setup.viewTop,
+      bottom: setup.viewBottom,
+      leading: 0,
+      trailing: 0
+    }
+  });
+  tab.active = new ios.View({
+    name: ".active",
+    backgroundColor: "transparent",
+    constraints: {
+      top: 0,
+      bottom: 0,
+      leading: 0,
+      trailing: 0
+    },
+    superLayer: tab
+  });
+  tab.active.icon = new ios.View({
+    name: ".active.icon",
+    constraints: {
+      width: 25,
+      height: 25,
+      align: "horizontal",
+      top: 7
+    },
+    backgroundColor: "transparent",
+    superLayer: tab.active
+  });
+  if (setup.active === void 0) {
+    tab.active.icon.image = setup.activeIcon;
+    tab.active.icon.width = 52;
+    tab.active.icon.height = 52;
+  } else {
+    setup.active.superLayer = tab.active.icon;
+    setup.active.props = {
+      width: tab.active.icon.width,
+      height: tab.active.icon.height
+    };
+  }
+  tab.inactive = new ios.View({
+    backgroundColor: "transparent",
+    name: ".inactive",
+    constraints: {
+      top: 0,
+      bottom: 0,
+      leading: 0,
+      trailing: 0
+    },
+    superLayer: tab
+  });
+  tab.inactive.icon = new ios.View({
+    constraints: {
+      width: 25,
+      height: 25,
+      align: "horizontal",
+      top: 7
+    },
+    backgroundColor: "transparent",
+    name: ".inactive.icon",
+    superLayer: tab.inactive
+  });
+  tab.label = new ios.Text({
+    text: setup.label,
+    superLayer: tab,
+    color: "#929292",
+    fontSize: 10,
+    name: ".label",
+    textTransform: "capitalize"
+  });
+  tab.label.constraints = {
+    bottom: 2,
+    horizontalCenter: tab.active.icon
+  };
+  if (setup.inactive === void 0) {
+    tab.inactive.icon.image = setup.inactiveIcon;
+    tab.inactive.icon.width = 52;
+    tab.inactive.icon.height = 52;
+  } else {
+    setup.inactive.superLayer = tab.inactive.icon;
+    setup.inactive.props = {
+      width: tab.inactive.icon.width,
+      height: tab.inactive.icon.height
+    };
+  }
+  return tab;
+};
+
+exports.bar = function(array) {
+  var bar, dummyTab, dummyTab2, i, index, len, ref, setActive, setup, specs, tab;
+  setup = ios.utils.setupComponent(array, exports.defaults.bar);
+  if (setup.tabs.length === 0) {
+    dummyTab = new exports.tab;
+    dummyTab2 = new exports.tab;
+    setup.tabs.push(dummyTab);
+    setup.tabs.push(dummyTab2);
+  }
+  specs = {
+    width: 75
+  };
+  switch (ios.device.name) {
+    case "iphone-5":
+      specs.width = 55;
+  }
+  bar = new ios.View({
+    backgroundColor: "transparent",
+    name: "tabBar",
+    constraints: {
+      leading: 0,
+      trailing: 0,
+      bottom: 0,
+      height: 52
+    }
+  });
+  bar.bg = new ios.View({
+    superLayer: bar,
+    name: ".bg",
+    constraints: {
+      leading: 0,
+      trailing: 0,
+      bottom: 0,
+      height: 52
+    }
+  });
+  bar.divider = new ios.View({
+    backgroundColor: "#B2B2B2",
+    name: ".divider",
+    superLayer: bar,
+    constraints: {
+      top: 0,
+      leading: 0,
+      trailing: 0,
+      height: .5
+    }
+  });
+  bar.box = new ios.View({
+    superLayer: bar,
+    backgroundColor: "transparent",
+    name: ".box",
+    constraints: {
+      height: 52,
+      width: setup.tabs.length * specs.width
+    }
+  });
+  setActive = function(tabIndex) {
+    var i, index, len, ref, results, tab;
+    ref = setup.tabs;
+    results = [];
+    for (index = i = 0, len = ref.length; i < len; index = ++i) {
+      tab = ref[index];
+      if (index === tabIndex) {
+        tab.label.color = ios.utils.color(setup.activeColor);
+        tab.active.visible = true;
+        tab.inactive.visible = false;
+        results.push(tab.view.visible = true);
+      } else {
+        tab.label.color = ios.utils.color(setup.inactiveColor);
+        tab.active.visible = false;
+        tab.inactive.visible = true;
+        results.push(tab.view.visible = false);
+      }
+    }
+    return results;
+  };
+  ref = setup.tabs;
+  for (index = i = 0, len = ref.length; i < len; index = ++i) {
+    tab = ref[index];
+    bar.box.addSubLayer(tab);
+    tab.label.color = ios.utils.color(setup.inactiveColor);
+    bar.bg.backgroundColor = setup.backgroundColor;
+    if (setup.blur) {
+      bar.bg.backgroundColor = "rgba(255,255,255, .9)";
+      ios.utils.bgBlur(bar.bg);
+    }
+    if (index === 0) {
+      tab.constraints.leading = 0;
+    } else {
+      tab.constraints.leading = setup.tabs[index - 1];
+    }
+    ios.layout.set(tab);
+    tab.on(Events.TouchStart, function() {
+      var tabIndex;
+      tabIndex = this.x / ios.utils.px(specs.width);
+      return setActive(tabIndex);
+    });
+  }
+  bar.box.constraints = {
+    align: "horizontal"
+  };
+  ios.layout.set(bar.box);
+  setActive(setup.start);
+  bar.tabs = setup.tabs;
+  return bar;
+};
+
+
+},{"ios-kit":17}],26:[function(require,module,exports){
+var IpzMessenger, ios, ipz;
+
+ios = require('ios-kit');
+
+ipz = require('ipz-messenger-kit');
 
 IpzMessenger = (function() {
-  IpzMessenger.contentView = void 0;
+  IpzMessenger.homeView = void 0;
 
-  IpzMessenger.header = void 0;
-
-  function IpzMessenger(parentView) {
-    var footer;
-    this.header = new IpzMessengerHeader(parentView, 64);
-    footer = new ios.View({
-      superLayer: parentView,
-      backgroundColor: "green",
-      width: parentView.width,
-      height: 50,
-      y: parentView.height - 50
+  function IpzMessenger(parentView, users) {
+    var callsTab, callsView, cameraTab, gamesTab, gamesView, homeTab, peopleTab, peopleView, tabBar;
+    homeTab = new ipz.IpzMessengerTab({
+      label: "Home",
+      activeIcon: "images/homeIconActive.png",
+      inactiveIcon: "images/homeIcon.png",
+      viewTop: parentView.y,
+      viewBottom: 50
     });
-    this.contentView = new ios.View({
-      superLayer: parentView,
-      backgroundColor: "yellow",
-      y: this.header.height,
+    callsTab = new ipz.IpzMessengerTab({
+      label: "Calls",
+      activeIcon: "images/callIconActive.png",
+      inactiveIcon: "images/callIcon.png",
+      viewTop: parentView.y,
+      viewBottom: 50
+    });
+    cameraTab = new ipz.IpzMessengerTab({
+      label: "",
+      activeIcon: "images/Circle.png",
+      inactiveIcon: "images/Circle.png",
+      viewTop: parentView.y,
+      viewBottom: 50
+    });
+    peopleTab = new ipz.IpzMessengerTab({
+      label: "People",
+      activeIcon: "images/groupsIconActive.png",
+      inactiveIcon: "images/groupsIcon.png",
+      viewTop: parentView.y,
+      viewBottom: 50
+    });
+    gamesTab = new ipz.IpzMessengerTab({
+      label: "Games",
+      activeIcon: "images/gamesIconActive.png",
+      inactiveIcon: "images/gamesIcon.png",
+      viewTop: parentView.y,
+      viewBottom: 50
+    });
+    tabBar = new ipz.IpzMessengerTabBar({
+      tabs: [homeTab, callsTab, cameraTab, peopleTab, gamesTab],
+      activeColor: "blue",
+      inactiveColor: "grey",
+      start: 0
+    });
+    this.homeView = new ipz.IpzMessengerHome(homeTab.view, users);
+    callsView = new ipz.IpzMessengerCalls(callsTab.view);
+    peopleView = new ios.View({
+      superLayer: peopleTab.view,
+      y: parentView.y,
       width: parentView.width,
-      height: parentView.height - this.header.height - footer.height
+      backgroundColor: "blue"
+    });
+    gamesView = new ios.View({
+      superLayer: gamesTab.view,
+      y: parentView.y,
+      width: parentView.width,
+      backgroundColor: "red"
     });
   }
 
-  IpzMessenger.prototype.login = function(username, avatar) {
-    var welcomeText;
-    welcomeText = new ios.Text({
-      text: "Welcome, " + username,
-      superLayer: this.contentView
-    });
-    return this.header.setAvatar(avatar);
+  IpzMessenger.prototype.login = function(user) {
+    return this.homeView.setAvatar(user);
   };
 
   return IpzMessenger;
@@ -6051,6 +5980,283 @@ IpzMessenger = (function() {
 module.exports = IpzMessenger;
 
 
-},{"ios-kit":18,"ipz-messenger-header":21}]},{},[1])
+},{"ios-kit":17,"ipz-messenger-kit":22}],27:[function(require,module,exports){
+var ActiveFriends, ActiveFriendsScrollList, Avatar, MessageList, MessageListItem, style,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+style = {
+  margin: 22,
+  margins: 44,
+  fontSizes: {
+    name: 28,
+    messageText: 24,
+    messageTime: 22
+  },
+  fontWeights: []
+};
+
+Avatar = (function(superClass) {
+  extend(Avatar, superClass);
+
+  function Avatar(options, user) {
+    var sign;
+    if (options == null) {
+      options = {};
+    }
+    this.changeStatus = bind(this.changeStatus, this);
+    if (options.scale == null) {
+      options.scale = 1;
+    }
+    options.width = options.height = 100 * options.scale;
+    options.backgroundColor = "#EEEEEE";
+    options.borderRadius = 100;
+    if (options.image == null) {
+      options.image = user.image_0;
+    }
+    if (options.status == null) {
+      options.status = user.status;
+    }
+    Avatar.__super__.constructor.call(this, options);
+    sign = new Layer({
+      parent: this,
+      x: Align.right,
+      y: Align.bottom,
+      width: 36 / 100 * this.width,
+      height: 36 / 100 * this.height,
+      borderRadius: 100,
+      backgroundColor: "transparent",
+      borderWidth: 4 * options.scale
+    });
+    sign.states = {
+      inactive: {
+        borderWidth: 0,
+        backgroundColor: "transparent",
+        image: null
+      },
+      active: {
+        image: null,
+        backgroundColor: "#60CA11",
+        borderColor: "#FFFFFF"
+      },
+      messenger: {
+        borderColor: "#FFFFFF",
+        image: "images/messengerIcon.png"
+      }
+    };
+    this.subLayers[0].animate(options.status);
+  }
+
+  Avatar.prototype.changeStatus = function(type) {
+    return this.subLayers[0].animate(type);
+  };
+
+  return Avatar;
+
+})(Layer);
+
+exports.Avatar = Avatar;
+
+MessageListItem = (function(superClass) {
+  extend(MessageListItem, superClass);
+
+  function MessageListItem(options, user) {
+    var avatar, lastMessage, lastMessageTime, name;
+    if (options == null) {
+      options = {};
+    }
+    this.changeName = bind(this.changeName, this);
+    if (options.scale == null) {
+      options.scale = 1;
+    }
+    options.x = Align.center;
+    options.width = Screen.width - style.margins;
+    options.height = 150 * options.scale;
+    options.backgroundColor = "transparent";
+    options.clip = true;
+    MessageListItem.__super__.constructor.call(this, options);
+    options.name = user.firstname + " " + user.lastname;
+    options.lastMessage = user.messageText;
+    options.lastMessageTime = user.messageTime;
+    avatar = new Avatar({
+      parent: this,
+      y: style.margin * options.scale
+    }, user);
+    name = new TextLayer({
+      name: "name",
+      parent: this,
+      x: avatar.maxX + options.scale * 40,
+      fontSize: 28 * options.scale,
+      y: options.height / 4,
+      text: options.name,
+      fontSize: 28 * options.scale
+    });
+    lastMessage = new TextLayer({
+      name: "lastMessage",
+      parent: this,
+      x: name.x,
+      y: options.height / 1.8,
+      text: options.lastMessage,
+      fontSize: 24 * options.scale,
+      truncate: true
+    });
+    lastMessageTime = new TextLayer({
+      name: "lastMessageTime",
+      parent: this,
+      x: Align.right,
+      y: name.y,
+      fontSize: 22 * options.scale,
+      text: options.lastMessageTime
+    });
+  }
+
+  MessageListItem.prototype.changeName = function(name) {
+    return this.name = name;
+  };
+
+  return MessageListItem;
+
+})(Layer);
+
+exports.MessageListItem = MessageListItem;
+
+MessageList = (function(superClass) {
+  extend(MessageList, superClass);
+
+  function MessageList(options, users) {
+    var i, index, len, message, user;
+    if (options == null) {
+      options = {};
+    }
+    if (options.scale == null) {
+      options.scale = 1;
+    }
+    options.width = Screen.width - style.margins;
+    options.height = users.length * 150 * options.scale;
+    options.x = Align.center;
+    options.backgroundColor = "transparent";
+    MessageList.__super__.constructor.call(this, options);
+    for (index = i = 0, len = users.length; i < len; index = ++i) {
+      user = users[index];
+      message = new MessageListItem({
+        parent: this,
+        y: options.scale * index * 150
+      }, user);
+    }
+  }
+
+  return MessageList;
+
+})(Layer);
+
+exports.MessageList = MessageList;
+
+ActiveFriendsScrollList = (function(superClass) {
+  extend(ActiveFriendsScrollList, superClass);
+
+  function ActiveFriendsScrollList(options, users) {
+    var avatar, container, i, index, len, name, user;
+    if (options == null) {
+      options = {};
+    }
+    if (options.scale == null) {
+      options.scale = 1;
+    }
+    options.width = Screen.width;
+    options.height = options.scale * 200;
+    options.scrollVertical = false;
+    ActiveFriendsScrollList.__super__.constructor.call(this, options);
+    this.content.height = null;
+    for (index = i = 0, len = users.length; i < len; index = ++i) {
+      user = users[index];
+      container = new Layer({
+        parent: this.content,
+        x: index * (100 + style.margin),
+        width: 100,
+        backgroundColor: "transparent"
+      });
+      avatar = new Avatar({
+        parent: container
+      }, user);
+      name = new TextLayer({
+        parent: container,
+        text: user.firstname,
+        fontSize: 24 * options.scale,
+        y: avatar.maxY + 10
+      });
+      container.width = avatar.width;
+      avatar.x = name.x = Align.center;
+      this.content.height = container.height = avatar.height + name.height + 10;
+      this.content.y = Align.center;
+    }
+  }
+
+  return ActiveFriendsScrollList;
+
+})(ScrollComponent);
+
+exports.ActiveFriendsScrollList = ActiveFriendsScrollList;
+
+ActiveFriends = (function(superClass) {
+  extend(ActiveFriends, superClass);
+
+  function ActiveFriends(options, users) {
+    var activeFriendsIcon, activeFriendsLabel, activeNow, activeNowSettings, scroll;
+    if (options == null) {
+      options = {};
+    }
+    if (options.scale == null) {
+      options.scale = 1;
+    }
+    options.height = 250;
+    options.width = Screen.width - style.margins;
+    options.backgroundColor = "transparent";
+    ActiveFriends.__super__.constructor.call(this, options);
+    activeFriendsLabel = new Layer({
+      parent: this,
+      width: this.width,
+      height: 100 * options.scale,
+      backgroundColor: "transparent"
+    });
+    activeFriendsIcon = new Layer({
+      parent: activeFriendsLabel,
+      x: Align.left,
+      y: Align.center,
+      image: "images/activeNowIcon.png",
+      width: 40,
+      height: 40
+    });
+    activeNow = new TextLayer({
+      parent: activeFriendsLabel,
+      x: activeFriendsIcon.maxX + 24,
+      fontSize: 24,
+      fontWeight: "bold",
+      fontColor: "black",
+      y: Align.center,
+      text: "Active now (" + users.length + ") >"
+    });
+    activeNowSettings = new Layer({
+      parent: activeFriendsLabel,
+      x: Align.right(36),
+      y: Align.center,
+      image: "images/activeNowSettings.png",
+      width: 75,
+      height: 75
+    });
+    scroll = new ActiveFriendsScrollList({
+      parent: this,
+      y: Align.bottom
+    }, users);
+  }
+
+  return ActiveFriends;
+
+})(Layer);
+
+exports.ActiveFriends = ActiveFriends;
+
+
+},{}]},{},[1])
 
 //# sourceMappingURL=main.js.map

@@ -1,31 +1,25 @@
 
 # Global settings
 ios = require 'ios-kit'
-UsersDAL = require "ipz-dal-usersDAL"
 MasterLayout = require "ipz-master-layout"
+usersModule = require "ipz-dal-usersDAL"
 
 Framer.Device.customize
-    deviceType: Framer.Device.Type.Tablet
+    deviceType: "apple-iphone-6s-plus-space-gray"
     screenWidth: 750
     screenHeight: 1334
     devicePixelRatio: 1
 
+Framer.Defaults.Layer.force2d = true
+ios.device.name = "iphone-6s"
 
 # Style
 Screen.backgroundColor = "white"
 
-# Users
-# Get some data from restdb.io
-# userDal = new UsersDAL
-# users = userDal.getUsers({}, 12, "", "serialno", -1)
-
-# favoriteUsers = userDal.getFavoriteUsers(users)
-# birthdayUsers = userDal.getBirthdayUsers(users)
-# activeUsers = userDal.getActiveUsers(users)
-# myDays = userDal.getMyDays(users)
-# myDays.sort(myDayTime,0)
+usersDB = new usersModule
+users = usersDB.getUsers({},20, "", "serialno", -1)
 
 masterLayout = new MasterLayout
 messenger = masterLayout.openApp("Messenger")
-messenger.login("Andy", "images/Ethan.png")
+messenger.login(users[0])
 
