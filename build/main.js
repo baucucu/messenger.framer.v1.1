@@ -8,7 +8,6 @@ MasterLayout = require("ipz-master-layout");
 usersModule = require("ipz-dal-usersDAL");
 
 Framer.Device.customize({
-  deviceType: "apple-iphone-6s-plus-space-gray",
   screenWidth: 750,
   screenHeight: 1334,
   devicePixelRatio: 1

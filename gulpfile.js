@@ -23,10 +23,10 @@ gulp.task('html', function() {
 // Recipe from http://www.uberbrady.com/2015/05/how-to-do-gulp-browserify-coffeescript.html
 gulp.task('coffee', function() {
   browserify({
-    entries: ["./app/main.coffee"],
+    entries: ["./app.coffee"],
     debug: true,
     extensions: [".coffee"],
-    paths: ["./app/modules"],
+    paths: ["./modules"],
     transform: ["coffeeify"] // npm install --save-dev coffeeify
     })
   .bundle()
@@ -36,7 +36,7 @@ gulp.task('coffee', function() {
       err.toString()
     );
   })
-  .pipe(source('main.js'))
+  .pipe(source('app.js'))
   .pipe(buffer())
   .pipe(sourcemaps.init({loadMaps: true,debug: true}))
   // .pipe(uglify( {
@@ -46,17 +46,17 @@ gulp.task('coffee', function() {
   //       }
   //   }))
   .pipe(sourcemaps.write("./" /* optional second param here */))
-  .pipe(gulp.dest('build'))
+  .pipe(gulp.dest('.'))
   .pipe(connect.reload());
 });
  
 gulp.task('watch', function() {
   gulp.watch(['./*.html'], ['html']);
-  gulp.watch('./app/**/*.coffee', ['coffee']);
+  gulp.watch('./**/*.coffee', ['coffee']);
 });
 
 gulp.task('export', function() {
-  gulp.src(['app/**/*']).pipe(gulp.dest('export/framer-boilerplate.framer'));
+  gulp.src(['**/*']).pipe(gulp.dest('export/framer-boilerplate.framer'));
 });
  
 gulp.task('default', ['coffee', 'webserver', 'html', 'watch']);
